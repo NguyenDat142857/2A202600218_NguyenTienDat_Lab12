@@ -3,9 +3,9 @@
 > **AICB-P1 · VinUniversity 2026**  
 > Repository thực hành đi kèm bài giảng Day 12.  
 > Mỗi phần có ví dụ **cơ bản** (hiểu concept) và **chuyên sâu** (production-ready).
-> ### 📸 kết quả được lưu trong file pic_result
+> ### 📸 kết quả được lưu trong file pic_result pic_result
 
-![Result](https://github.com/<your-username>/2A202600218_NguyenTienDat_Lab12/blob/main/pic_result.png)
+![pic_result](pic_result)
 
 ---
 
