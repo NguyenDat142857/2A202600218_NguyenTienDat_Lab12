@@ -1,19 +1,3 @@
-# ============================================================
-# Docker Compose — Full Agent Stack
-#
-# Services:
-#   1. agent    — FastAPI AI agent (2 replicas)
-#   2. redis    — Cache cho session và rate limiting
-#   3. qdrant   — Vector database cho RAG
-#   4. nginx    — Reverse proxy, load balancer
-#
-# Chạy: docker compose up
-# Test:  curl http://localhost/health
-# Stop:  docker compose down
-# ============================================================
-
-version: "3.9"
-
 services:
 
   # ──────────────────────────────────────
@@ -21,37 +5,36 @@ services:
   # ──────────────────────────────────────
   agent:
     build:
-      context: .
-      dockerfile: Dockerfile
-      target: runtime          # chỉ build stage "runtime", không build "builder"
+      context: ../..
+      dockerfile: 02-docker/production/Dockerfile
+      target: runtime
     environment:
-      - ENVIRONMENT=staging
-      - PORT=8000
-      - REDIS_URL=redis://redis:6379/0
-      - QDRANT_URL=http://qdrant:6333
-      # ❌ KHÔNG đặt secrets trực tiếp ở đây trong production
-      # ✅ Dùng: docker secret hoặc env file ngoài git
-    env_file:
-      - .env.local              # secrets riêng, trong .gitignore
+      ENVIRONMENT: staging
+      PORT: 8000
+      REDIS_URL: redis://redis:6379/0
+      QDRANT_URL: http://qdrant:6333
+    # ❗ nếu chưa có file này thì COMMENT lại
+    # env_file:
+    #   - .env.local
+
     depends_on:
-      redis:
-        condition: service_healthy
-      qdrant:
-        condition: service_healthy
+      - redis
+      - qdrant
+
     healthcheck:
-      test: ["CMD", "python", "-c",
-             "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
+
     restart: unless-stopped
-    # Không expose port trực tiếp — dùng qua Nginx
     networks:
       - internal
 
+
   # ──────────────────────────────────────
-  # Redis — Session cache & Rate limiting
+  # Redis
   # ──────────────────────────────────────
   redis:
     image: redis:7-alpine
@@ -66,8 +49,9 @@ services:
     networks:
       - internal
 
+
   # ──────────────────────────────────────
-  # Qdrant — Vector database
+  # Qdrant
   # ──────────────────────────────────────
   qdrant:
     image: qdrant/qdrant:v1.9.0
@@ -81,14 +65,14 @@ services:
     networks:
       - internal
 
+
   # ──────────────────────────────────────
-  # Nginx — Reverse proxy & Load balancer
+  # Nginx
   # ──────────────────────────────────────
   nginx:
     image: nginx:alpine
     ports:
-      - "80:80"      # HTTP
-      - "443:443"    # HTTPS (cần cert)
+      - "80:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
@@ -97,15 +81,17 @@ services:
     networks:
       - internal
 
+
 # ──────────────────────────────────────
-# Volumes — persistent data
+# Volumes
 # ──────────────────────────────────────
 volumes:
   redis_data:
   qdrant_data:
 
+
 # ──────────────────────────────────────
-# Network — isolate internal traffic
+# Network
 # ──────────────────────────────────────
 networks:
   internal:
