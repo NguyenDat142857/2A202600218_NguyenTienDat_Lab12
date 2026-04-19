@@ -3,7 +3,7 @@
 > **AICB-P1 · VinUniversity 2026**  
 > Repository thực hành đi kèm bài giảng Day 12.  
 > Mỗi phần có ví dụ **cơ bản** (hiểu concept) và **chuyên sâu** (production-ready).
-> ### 📸 kết quả được lưu trong file ![pic_result](pic_result)t
+> ### 📸 kết quả được lưu trong file ![pic_result](pic_result)
 
 ---
 
